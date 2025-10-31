@@ -70,6 +70,8 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [cart, setCart] = useState<{id: number; quantity: number}[]>([]);
   const [showCart, setShowCart] = useState(false);
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [showFavorites, setShowFavorites] = useState(false);
 
   const categories = ['Все', 'Аудио', 'Компьютеры', 'Гаджеты', 'Аксессуары'];
 
@@ -99,6 +101,16 @@ const Index = () => {
     });
   };
 
+  const toggleFavorite = (productId: number) => {
+    setFavorites(prev => 
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const favoriteProducts = products.filter(p => favorites.includes(p.id));
+
   const cartTotal = cart.reduce((sum, item) => {
     const product = products.find(p => p.id === item.id);
     return sum + (product?.price || 0) * item.quantity;
@@ -127,6 +139,19 @@ const Index = () => {
                 variant="ghost"
                 size="icon"
                 className="relative"
+                onClick={() => setShowFavorites(!showFavorites)}
+              >
+                <Icon name="Heart" size={20} />
+                {favorites.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                    {favorites.length}
+                  </Badge>
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative"
                 onClick={() => setShowCart(!showCart)}
               >
                 <Icon name="ShoppingCart" size={20} />
@@ -140,6 +165,52 @@ const Index = () => {
           </div>
         </div>
       </header>
+
+      {showFavorites && (
+        <div className="fixed inset-0 bg-black/50 z-50 animate-fade-in" onClick={() => setShowFavorites(false)}>
+          <div
+            className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl p-6 overflow-y-auto animate-scale-in"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Избранное</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowFavorites(false)}>
+                <Icon name="X" size={20} />
+              </Button>
+            </div>
+
+            {favoriteProducts.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <Icon name="Heart" size={48} className="mx-auto mb-4 opacity-50" />
+                <p>Пока нет избранных товаров</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {favoriteProducts.map(product => (
+                  <Card key={product.id} className="p-4">
+                    <div className="flex gap-4">
+                      <img src={product.image} alt={product.name} className="w-20 h-20 object-cover rounded" />
+                      <div className="flex-1">
+                        <h3 className="font-medium mb-1">{product.name}</h3>
+                        <p className="text-lg font-bold mb-2">{product.price.toLocaleString('ru-RU')} ₽</p>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => addToCart(product.id)}>
+                            <Icon name="ShoppingCart" size={14} className="mr-1" />
+                            В корзину
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => toggleFavorite(product.id)}>
+                            <Icon name="X" size={14} />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {showCart && (
         <div className="fixed inset-0 bg-black/50 z-50 animate-fade-in" onClick={() => setShowCart(false)}>
@@ -259,7 +330,24 @@ const Index = () => {
                   />
                 </div>
                 <div className="p-6">
-                  <Badge variant="secondary" className="mb-3">{product.category}</Badge>
+                  <div className="flex items-start justify-between mb-3">
+                    <Badge variant="secondary">{product.category}</Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(product.id);
+                      }}
+                    >
+                      <Icon 
+                        name="Heart" 
+                        size={18} 
+                        className={favorites.includes(product.id) ? 'fill-primary text-primary' : ''}
+                      />
+                    </Button>
+                  </div>
                   <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
                   <p className="text-muted-foreground mb-4">{product.description}</p>
                   <div className="flex items-center justify-between">
