@@ -6,13 +6,15 @@ interface RecommendationsSectionProps {
   favorites: number[];
   onAddToCart: (productId: number) => void;
   onToggleFavorite: (productId: number) => void;
+  onProductClick: (productId: number) => void;
 }
 
 const RecommendationsSection = ({ 
   recommendations, 
   favorites, 
   onAddToCart, 
-  onToggleFavorite 
+  onToggleFavorite,
+  onProductClick
 }: RecommendationsSectionProps) => {
   if (recommendations.length === 0) return null;
 
@@ -29,6 +31,7 @@ const RecommendationsSection = ({
               isRecommended={true}
               onAddToCart={onAddToCart}
               onToggleFavorite={onToggleFavorite}
+              onCardClick={onProductClick}
             />
           ))}
         </div>

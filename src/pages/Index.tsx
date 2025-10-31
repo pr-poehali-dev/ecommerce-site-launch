@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { products } from '@/data/products';
 import Header from '@/components/Header';
 import FavoritesSidebar from '@/components/FavoritesSidebar';
@@ -11,12 +12,17 @@ import DeliverySection from '@/components/DeliverySection';
 import Footer from '@/components/Footer';
 
 const Index = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Все');
   const [cart, setCart] = useState<{id: number; quantity: number}[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [favorites, setFavorites] = useState<number[]>([]);
   const [showFavorites, setShowFavorites] = useState(false);
+
+  const handleProductClick = (productId: number) => {
+    navigate(`/product/${productId}`);
+  };
 
   const categories = ['Все', 'Аудио', 'Компьютеры', 'Гаджеты', 'Аксессуары'];
 
@@ -113,6 +119,7 @@ const Index = () => {
         favorites={favorites}
         onAddToCart={addToCart}
         onToggleFavorite={toggleFavorite}
+        onProductClick={handleProductClick}
       />
 
       <CatalogSection
@@ -123,6 +130,7 @@ const Index = () => {
         onCategoryChange={setSelectedCategory}
         onAddToCart={addToCart}
         onToggleFavorite={toggleFavorite}
+        onProductClick={handleProductClick}
       />
 
       <AboutSection />

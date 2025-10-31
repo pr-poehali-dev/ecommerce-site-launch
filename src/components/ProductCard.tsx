@@ -10,6 +10,7 @@ interface ProductCardProps {
   isRecommended?: boolean;
   onAddToCart: (productId: number) => void;
   onToggleFavorite: (productId: number) => void;
+  onCardClick?: (productId: number) => void;
 }
 
 const ProductCard = ({ 
@@ -17,10 +18,14 @@ const ProductCard = ({
   isFavorite, 
   isRecommended = false,
   onAddToCart, 
-  onToggleFavorite 
+  onToggleFavorite,
+  onCardClick
 }: ProductCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300 group animate-fade-in">
+    <Card 
+      className="overflow-hidden hover:shadow-xl transition-shadow duration-300 group animate-fade-in cursor-pointer"
+      onClick={() => onCardClick && onCardClick(product.id)}
+    >
       <div className="aspect-square overflow-hidden bg-secondary/20 relative">
         <img
           src={product.image}
@@ -54,7 +59,10 @@ const ProductCard = ({
         <p className="text-muted-foreground mb-4">{product.description}</p>
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold">{product.price.toLocaleString('ru-RU')} ₽</span>
-          <Button onClick={() => onAddToCart(product.id)}>
+          <Button onClick={(e) => {
+            e.stopPropagation();
+            onAddToCart(product.id);
+          }}>
             <Icon name="ShoppingCart" size={18} className="mr-2" />
             В корзину
           </Button>

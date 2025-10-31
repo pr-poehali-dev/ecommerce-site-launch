@@ -11,6 +11,7 @@ interface CatalogSectionProps {
   onCategoryChange: (category: string) => void;
   onAddToCart: (productId: number) => void;
   onToggleFavorite: (productId: number) => void;
+  onProductClick: (productId: number) => void;
 }
 
 const CatalogSection = ({ 
@@ -20,7 +21,8 @@ const CatalogSection = ({
   favorites, 
   onCategoryChange, 
   onAddToCart, 
-  onToggleFavorite 
+  onToggleFavorite,
+  onProductClick
 }: CatalogSectionProps) => {
   return (
     <section id="catalog" className="py-12">
@@ -46,6 +48,7 @@ const CatalogSection = ({
               isFavorite={favorites.includes(product.id)}
               onAddToCart={onAddToCart}
               onToggleFavorite={onToggleFavorite}
+              onCardClick={onProductClick}
             />
           ))}
         </div>
