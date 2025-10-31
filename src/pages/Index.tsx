@@ -111,6 +111,15 @@ const Index = () => {
 
   const favoriteProducts = products.filter(p => favorites.includes(p.id));
 
+  const getRecommendations = (productId: number) => {
+    const currentProduct = products.find(p => p.id === productId);
+    if (!currentProduct) return [];
+    
+    return products
+      .filter(p => p.id !== productId && p.category === currentProduct.category)
+      .slice(0, 3);
+  };
+
   const cartTotal = cart.reduce((sum, item) => {
     const product = products.find(p => p.id === item.id);
     return sum + (product?.price || 0) * item.quantity;
@@ -302,8 +311,63 @@ const Index = () => {
         </div>
       </section>
 
+      {cart.length > 0 && (
+        <section className="py-12 bg-gradient-to-b from-primary/5 to-background">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold mb-8 text-center">Вам может понравиться</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {cart.slice(0, 1).flatMap(item => getRecommendations(item.id)).map(product => (
+                <Card
+                  key={product.id}
+                  className="overflow-hidden hover:shadow-xl transition-shadow duration-300 group"
+                >
+                  <div className="aspect-square overflow-hidden bg-secondary/20 relative">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <Badge className="absolute top-3 left-3 bg-primary">Рекомендуем</Badge>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <Badge variant="secondary">{product.category}</Badge>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavorite(product.id);
+                        }}
+                      >
+                        <Icon 
+                          name="Heart" 
+                          size={18} 
+                          className={favorites.includes(product.id) ? 'fill-primary text-primary' : ''}
+                        />
+                      </Button>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+                    <p className="text-muted-foreground mb-4">{product.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold">{product.price.toLocaleString('ru-RU')} ₽</span>
+                      <Button onClick={() => addToCart(product.id)}>
+                        <Icon name="ShoppingCart" size={18} className="mr-2" />
+                        В корзину
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section id="catalog" className="py-12">
         <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-8">Каталог товаров</h2>
           <div className="flex flex-wrap gap-3 mb-8">
             {categories.map(category => (
               <Button
